@@ -1,7 +1,7 @@
-FROM node:22-bookworm-slim
+FROM node:22-bookworm
 
-LABEL org.opencontainers.image.source="https://github.com/phioranex/moltbot-docker"
-LABEL org.opencontainers.image.description="Pre-built Moltbot Docker image"
+LABEL org.opencontainers.image.source="https://github.com/phioranex/clawbot-docker"
+LABEL org.opencontainers.image.description="Pre-built OpenClaw (Clawbot) Docker image"
 LABEL org.opencontainers.image.licenses="MIT"
 
 # Install system dependencies
@@ -21,23 +21,24 @@ RUN corepack enable
 
 WORKDIR /app
 
-# Clone and build Moltbot
-ARG MOLTBOT_VERSION=main
-RUN git clone --depth 1 --branch ${MOLTBOT_VERSION} https://github.com/moltbot/moltbot.git .
+# Clone and build OpenClaw
+ARG OPENCLAW_VERSION=main
+RUN git clone --depth 1 --branch ${OPENCLAW_VERSION} https://github.com/openclaw/openclaw.git .
 
 # Install dependencies
 RUN pnpm install --frozen-lockfile
 
 # Build
-RUN pnpm build
-RUN pnpm ui:install
-RUN pnpm ui:build
+RUN OPENCLAW_A2UI_SKIP_MISSING=1 pnpm build
+# Force pnpm for UI build (Bun may fail on ARM/Synology architectures)
+RUN npm_config_script_shell=bash pnpm ui:install
+RUN npm_config_script_shell=bash pnpm ui:build
 
 # Clean up build artifacts to reduce image size
 RUN rm -rf .git node_modules/.cache
 
 # Create app user (node already exists in base image)
-RUN mkdir -p /home/node/.clawdbot /home/node/clawd \
+RUN mkdir -p /home/node/.openclaw /home/node/.openclaw/workspace \
     && chown -R node:node /home/node /app
 
 USER node

@@ -1,35 +1,35 @@
 services:
-  moltbot-gateway:
-    image: ghcr.io/phioranex/moltbot-docker:latest
-    container_name: clawdbot-gateway
+  openclaw-gateway:
+    image: ghcr.io/phioranex/clawbot-docker:latest
+    container_name: openclaw-gateway
     restart: unless-stopped
     stdin_open: true
     tty: true
     volumes:
-      - ~/.clawdbot:/home/node/.moltbot
-      - ~/clawd:/home/node/clawd
+      - ~/.openclaw:/home/node/.openclaw
+      - ~/.openclaw/workspace:/home/node/.openclaw/workspace
     ports:
-      - "18789:18790"
+      - "18789:18789"
     environment:
       - NODE_ENV=production
-      - MOLTBOT_SKIP_SERVICE_CHECK=true
-    command: ["gateway"]
+      - OPENCLAW_SKIP_SERVICE_CHECK=true
+    command: ["node", "/app/dist/index.js", "gateway", "--port", "18789", "--bind", "lan"]
   
   socat-proxy:
     image: alpine/socat
-    container_name: clawdbot-socat
+    container_name: openclaw-socat
     restart: unless-stopped
-    network_mode: "service:moltbot-gateway"
+    network_mode: "service:openclaw-gateway"
     command: "TCP-LISTEN:18790,fork,bind=0.0.0.0,reuseaddr TCP:127.0.0.1:18789"
 
-  moltbot-cli:
-    image: ghcr.io/phioranex/moltbot-docker:latest
-    container_name: clawdbot-cli
+  openclaw-cli:
+    image: ghcr.io/phioranex/clawbot-docker:latest
+    container_name: openclaw-cli
     stdin_open: true
     tty: true
     volumes:
-      - ~/.clawdbot:/home/node/.moltbot
-      - ~/clawd:/home/node/clawd
+      - ~/.openclaw:/home/node/.openclaw
+      - ~/.openclaw/workspace:/home/node/.openclaw/workspace
     environment:
       - NODE_ENV=production
     entrypoint: ["node", "/app/dist/index.js"]

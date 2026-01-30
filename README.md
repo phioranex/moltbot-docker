@@ -1,19 +1,19 @@
-# Moltbot Docker Image
+# OpenClaw (Clawbot) Docker Image
 
-Pre-built Docker image for [Moltbot](https://github.com/moltbot/moltbot) — run your AI assistant in seconds without building from source.
+Pre-built Docker image for [OpenClaw](https://github.com/openclaw/openclaw) — run your AI assistant in seconds without building from source.
 
 ## One-Line Install (Recommended)
 
 ### Linux / macOS
 
 ```bash
-bash <(curl -fsSL https://raw.githubusercontent.com/phioranex/moltbot-docker/main/install.sh)
+bash <(curl -fsSL https://raw.githubusercontent.com/phioranex/clawbot-docker/main/install.sh)
 ```
 
 ### Windows (PowerShell)
 
 ```powershell
-irm https://raw.githubusercontent.com/phioranex/moltbot-docker/main/install.ps1 | iex
+irm https://raw.githubusercontent.com/phioranex/clawbot-docker/main/install.ps1 | iex
 ```
 
 > **Note for Windows users:** Make sure Docker Desktop is installed and running. You can also use WSL2 with the Linux installation command.
@@ -35,32 +35,32 @@ This will:
 
 ```bash
 # Just pull the image (no setup)
-bash <(curl -fsSL https://raw.githubusercontent.com/phioranex/moltbot-docker/main/install.sh) --pull-only
+bash <(curl -fsSL https://raw.githubusercontent.com/phioranex/clawbot-docker/main/install.sh) --pull-only
 
 # Skip onboarding (if already configured)
-bash <(curl -fsSL https://raw.githubusercontent.com/phioranex/moltbot-docker/main/install.sh) --skip-onboard
+bash <(curl -fsSL https://raw.githubusercontent.com/phioranex/clawbot-docker/main/install.sh) --skip-onboard
 
 # Don't start gateway after setup
-bash <(curl -fsSL https://raw.githubusercontent.com/phioranex/moltbot-docker/main/install.sh) --no-start
+bash <(curl -fsSL https://raw.githubusercontent.com/phioranex/clawbot-docker/main/install.sh) --no-start
 
 # Custom install directory
-bash <(curl -fsSL https://raw.githubusercontent.com/phioranex/moltbot-docker/main/install.sh) --install-dir /opt/moltbot
+bash <(curl -fsSL https://raw.githubusercontent.com/phioranex/clawbot-docker/main/install.sh) --install-dir /opt/openclaw
 ```
 
 **Windows (PowerShell):**
 
 ```powershell
 # Just pull the image (no setup)
-irm https://raw.githubusercontent.com/phioranex/moltbot-docker/main/install.ps1 | iex -PullOnly
+irm https://raw.githubusercontent.com/phioranex/clawbot-docker/main/install.ps1 | iex -PullOnly
 
 # Skip onboarding (if already configured)
-irm https://raw.githubusercontent.com/phioranex/moltbot-docker/main/install.ps1 | iex -SkipOnboard
+irm https://raw.githubusercontent.com/phioranex/clawbot-docker/main/install.ps1 | iex -SkipOnboard
 
 # Don't start gateway after setup
-irm https://raw.githubusercontent.com/phioranex/moltbot-docker/main/install.ps1 | iex -NoStart
+irm https://raw.githubusercontent.com/phioranex/clawbot-docker/main/install.ps1 | iex -NoStart
 
 # Custom install directory
-$env:TEMP_INSTALL_SCRIPT = irm https://raw.githubusercontent.com/phioranex/moltbot-docker/main/install.ps1; Invoke-Expression $env:TEMP_INSTALL_SCRIPT -InstallDir "C:\moltbot"
+$env:TEMP_INSTALL_SCRIPT = irm https://raw.githubusercontent.com/phioranex/clawbot-docker/main/install.ps1; Invoke-Expression $env:TEMP_INSTALL_SCRIPT -InstallDir "C:\openclaw"
 ```
 
 ## Manual Install
@@ -69,46 +69,46 @@ $env:TEMP_INSTALL_SCRIPT = irm https://raw.githubusercontent.com/phioranex/moltb
 
 ```bash
 # Pull the image
-docker pull ghcr.io/phioranex/moltbot-docker:latest
+docker pull ghcr.io/phioranex/clawbot-docker:latest
 
 # Run onboarding (first time setup)
 docker run -it --rm \
-  -v ~/.clawdbot:/home/node/.clawdbot \
-  -v ~/clawd:/home/node/clawd \
-  ghcr.io/phioranex/moltbot-docker:latest onboard
+  -v ~/.openclaw:/home/node/.openclaw \
+  -v ~/.openclaw/workspace:/home/node/.openclaw/workspace \
+  ghcr.io/phioranex/clawbot-docker:latest onboard
 
 # Start the gateway
 docker run -d \
-  --name moltbot \
+  --name openclaw \
   --restart unless-stopped \
-  -v ~/.clawdbot:/home/node/.clawdbot \
-  -v ~/clawd:/home/node/clawd \
+  -v ~/.openclaw:/home/node/.openclaw \
+  -v ~/.openclaw/workspace:/home/node/.openclaw/workspace \
   -p 18789:18789 \
-  ghcr.io/phioranex/moltbot-docker:latest gateway start --foreground
+  ghcr.io/phioranex/clawbot-docker:latest gateway start --foreground
 ```
 
 ### Using Docker Compose
 
 ```bash
 # Clone this repo
-git clone https://github.com/phioranex/moltbot-docker.git
-cd moltbot-docker
+git clone https://github.com/phioranex/clawbot-docker.git
+cd clawbot-docker
 
 # Run onboarding
-docker compose run --rm moltbot-cli onboard
+docker compose run --rm openclaw-cli onboard
 
 # Start the gateway
-docker compose up -d moltbot-gateway
+docker compose up -d openclaw-gateway
 ```
 
 ## Configuration
 
 During onboarding, you'll configure:
-- **AI Provider** (Google AI, GitHub Copilot, Anthropic, etc.)
+- **AI Provider** (Anthropic Claude, OpenAI, etc.)
 - **Channels** (Telegram, WhatsApp, Discord, etc.)
 - **Gateway settings**
 
-Config is stored in `~/.clawdbot/` and persists across container restarts.
+Config is stored in `~/.openclaw/` and persists across container restarts.
 
 ## Available Tags
 
@@ -122,8 +122,8 @@ Config is stored in `~/.clawdbot/` and persists across container restarts.
 
 | Path | Purpose |
 |------|---------|
-| `/home/node/.clawdbot` | Config and session data |
-| `/home/node/clawd` | Agent workspace |
+| `/home/node/.openclaw` | Config and session data |
+| `/home/node/.openclaw/workspace` | Agent workspace |
 
 ## Ports
 
@@ -133,9 +133,10 @@ Config is stored in `~/.clawdbot/` and persists across container restarts.
 
 ## Links
 
-- [Moltbot Docs](https://docs.molt.bot)
-- [Moltbot GitHub](https://github.com/moltbot/moltbot)
-- [Discord Community](https://discord.com/invite/clawd)
+- [OpenClaw Website](https://openclaw.ai/)
+- [OpenClaw Docs](https://docs.openclaw.ai)
+- [OpenClaw GitHub](https://github.com/openclaw/openclaw)
+- [Discord Community](https://discord.gg/clawd)
 
 ## YouTube Tutorial
 
@@ -144,4 +145,4 @@ Config is stored in `~/.clawdbot/` and persists across container restarts.
 ## License
 
 This Docker packaging is provided by [Phioranex](https://phioranex.com).
-Moltbot itself is licensed under its own terms — see the [original repo](https://github.com/moltbot/moltbot).
+OpenClaw itself is licensed under MIT — see the [original repo](https://github.com/openclaw/openclaw).
