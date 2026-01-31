@@ -88,7 +88,7 @@ if ($Help) {
     Write-Host "  -SkipOnboard      Skip onboarding wizard"
     Write-Host "  -PullOnly         Only pull the image, don't set up"
     Write-Host "  -Help             Show this help message"
-    exit 0
+    return
 }
 
 # Main script
@@ -104,7 +104,7 @@ if (Test-Command docker) {
     Write-Host ""
     Write-Host "Docker is required but not installed." -ForegroundColor Red
     Write-Host "Install Docker Desktop: https://docs.docker.com/desktop/install/windows-install/" -ForegroundColor Yellow
-    exit 1
+    return
 }
 
 # Check Docker Compose
