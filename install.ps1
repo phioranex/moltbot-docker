@@ -184,7 +184,7 @@ if (-not $SkipOnboard) {
     Write-Host ""
     
     # Run onboarding
-    & $ComposeExe $ComposeBaseArgs run -T --rm openclaw-cli onboard
+    & $ComposeExe $ComposeBaseArgs run --rm openclaw-cli onboard
     if ($LASTEXITCODE -ne 0) {
         Write-Warning "Onboarding wizard was skipped or failed"
         Write-Host "You can run it later with: cd $InstallDir && $ComposeCmd run --rm openclaw-cli onboard" -ForegroundColor Yellow
