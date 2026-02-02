@@ -1,5 +1,5 @@
 #
-# OpenClaw (Clawbot) Docker Installer - Windows PowerShell Version
+# OpenClaw Docker Installer - Windows PowerShell Version
 # One-command setup for OpenClaw on Docker for Windows
 #
 # Usage:
@@ -78,7 +78,7 @@ function Test-Command {
 
 # Show help
 if ($Help) {
-    Write-Host "OpenClaw (Clawbot) Docker Installer - Windows"
+    Write-Host "OpenClaw Docker Installer - Windows"
     Write-Host ""
     Write-Host "Usage: install.ps1 [OPTIONS]"
     Write-Host ""

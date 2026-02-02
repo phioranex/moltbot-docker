@@ -1,4 +1,4 @@
-# OpenClaw (Clawbot) Docker Image
+# OpenClaw Docker Image
 
 Pre-built Docker image for [OpenClaw](https://github.com/openclaw/openclaw) — run your AI assistant in seconds without building from source.
 

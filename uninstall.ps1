@@ -1,5 +1,5 @@
 #
-# OpenClaw (Clawbot) Docker Uninstaller - Windows PowerShell Version
+# OpenClaw Docker Uninstaller - Windows PowerShell Version
 # Removes OpenClaw containers, data, and configuration
 #
 

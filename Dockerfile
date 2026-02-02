@@ -30,8 +30,8 @@ RUN rm -rf .git
 # Stage 2: Runtime
 FROM node:22-slim
 
-LABEL org.opencontainers.image.source="https://github.com/phioranex/clawbot-docker"
-LABEL org.opencontainers.image.description="Pre-built OpenClaw (Clawbot) Docker image"
+LABEL org.opencontainers.image.source="https://github.com/vaibhav-singh2/openclaw-docker"
+LABEL org.opencontainers.image.description="Pre-built OpenClaw Docker image"
 LABEL org.opencontainers.image.licenses="MIT"
 
 # Install system dependencies
