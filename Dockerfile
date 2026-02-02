@@ -24,7 +24,7 @@ RUN npm_config_script_shell=bash pnpm ui:install
 RUN npm_config_script_shell=bash pnpm ui:build
 
 # Prune development dependencies
-RUN pnpm prune --prod
+RUN CI=true pnpm prune --prod
 RUN rm -rf .git
 
 # Stage 2: Runtime
