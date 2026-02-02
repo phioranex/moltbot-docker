@@ -10,6 +10,9 @@ RUN apt-get update && apt-get install -y \
     curl \
     ca-certificates \
     unzip \
+    build-essential \
+    procps \
+    file \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Bun (required for build)
@@ -39,9 +42,13 @@ RUN rm -rf .git node_modules/.cache
 
 # Create app user (node already exists in base image)
 RUN mkdir -p /home/node/.openclaw /home/node/.openclaw/workspace \
-    && chown -R node:node /home/node /app
+    && mkdir -p /home/linuxbrew/.linuxbrew \
+    && chown -R node:node /home/node /app /home/linuxbrew
 
 USER node
+
+RUN /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+ENV PATH="/home/linuxbrew/.linuxbrew/bin:/home/linuxbrew/.linuxbrew/sbin:${PATH}"
 
 WORKDIR /home/node
 
