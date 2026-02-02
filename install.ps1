@@ -153,12 +153,28 @@ if ($PullOnly) {
 
 Write-Step "Setting up installation directory..."
 New-Item -ItemType Directory -Force -Path $InstallDir | Out-Null
-Set-Location $InstallDir
-Write-Success "Created $InstallDir"
 
-Write-Step "Downloading docker-compose.yml..."
-Invoke-WebRequest -Uri $ComposeUrl -OutFile "docker-compose.yml"
-Write-Success "Downloaded docker-compose.yml"
+if (Test-Path ".\docker-compose.yml") {
+    Write-Step "Copying local docker-compose.yml..."
+    Copy-Item ".\docker-compose.yml" -Destination "$InstallDir\docker-compose.yml" -Force
+    if (Test-Path ".\Dockerfile") {
+         Copy-Item ".\Dockerfile" -Destination "$InstallDir\Dockerfile" -Force
+         Write-Success "Copying local Dockerfile"
+    }
+    Write-Success "Used local docker-compose.yml"
+    $UseLocalBuild = $true
+} else {
+    Write-Step "Checking installation directory..."
+    Set-Location $InstallDir
+    Write-Success "Created $InstallDir"
+    
+    Write-Step "Downloading docker-compose.yml..."
+    Invoke-WebRequest -Uri $ComposeUrl -OutFile "docker-compose.yml"
+    Write-Success "Downloaded docker-compose.yml"
+    $UseLocalBuild = $false
+}
+
+Set-Location $InstallDir
 
 Write-Step "Creating data directories..."
 $ConfigDir = "$env:USERPROFILE\.openclaw"
@@ -168,9 +184,15 @@ New-Item -ItemType Directory -Force -Path $WorkspaceDir | Out-Null
 Write-Success "Created $ConfigDir (config)"
 Write-Success "Created $WorkspaceDir (workspace)"
 
-Write-Step "Pulling OpenClaw image..."
-docker pull $Image
-Write-Success "Image pulled successfully!"
+if (-not $UseLocalBuild) {
+    Write-Step "Pulling OpenClaw image..."
+    docker pull $Image
+    Write-Success "Image pulled successfully!"
+} else {
+    Write-Step "Building local images..."
+    & $ComposeExe $ComposeBaseArgs build
+    Write-Success "Images built successfully!"
+}
 
 # Onboarding
 if (-not $SkipOnboard) {

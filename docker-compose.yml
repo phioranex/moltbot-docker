@@ -1,6 +1,6 @@
 services:
   openclaw-gateway:
-    image: ghcr.io/phioranex/openclaw-docker:latest
+    build: .
     container_name: openclaw-gateway
     restart: unless-stopped
     stdin_open: true
@@ -9,13 +9,13 @@ services:
       - ~/.openclaw:/home/node/.openclaw
       - ~/.openclaw/workspace:/home/node/.openclaw/workspace
     ports:
-      - "18789:18789"
+      - "18789:18790"
       - "18790:18790"
     environment:
       - NODE_ENV=production
       - OPENCLAW_SKIP_SERVICE_CHECK=true
-    command: ["gateway"]
-  
+    command: [ "gateway" ]
+
   socat-proxy:
     image: alpine/socat
     container_name: openclaw-socat
@@ -24,7 +24,7 @@ services:
     command: "TCP-LISTEN:18790,fork,bind=0.0.0.0,reuseaddr TCP:127.0.0.1:18789"
 
   openclaw-cli:
-    image: ghcr.io/phioranex/openclaw-docker:latest
+    build: .
     container_name: openclaw-cli
     stdin_open: true
     tty: true
@@ -33,6 +33,6 @@ services:
       - ~/.openclaw/workspace:/home/node/.openclaw/workspace
     environment:
       - NODE_ENV=production
-    entrypoint: ["node", "/app/dist/index.js"]
+    entrypoint: [ "node", "/app/dist/index.js" ]
     profiles:
       - cli
