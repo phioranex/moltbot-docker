@@ -64,7 +64,6 @@ irm https://raw.githubusercontent.com/phioranex/openclaw-docker/main/install.ps1
 irm https://raw.githubusercontent.com/phioranex/openclaw-docker/main/install.ps1 | iex -NoStart
 
 # Custom install directory
-# Custom install directory
 $env:TEMP_INSTALL_SCRIPT = irm https://raw.githubusercontent.com/phioranex/openclaw-docker/main/install.ps1; Invoke-Expression $env:TEMP_INSTALL_SCRIPT -InstallDir "C:\openclaw"
 ```
 
