@@ -1,6 +1,9 @@
-# OpenClaw (Clawbot) Docker Image
+# OpenClaw Docker Image
 
 Pre-built Docker image for [OpenClaw](https://github.com/openclaw/openclaw) — run your AI assistant in seconds without building from source.
+
+> [!NOTE]
+> This fork includes **Homebrew (Linuxbrew)** pre-installed in the container, allowing you to easily install additional tools via `brew`.
 
 ## One-Line Install (Recommended)
 
@@ -19,6 +22,7 @@ irm https://raw.githubusercontent.com/phioranex/openclaw-docker/main/install.ps1
 > **Note for Windows users:** Make sure Docker Desktop is installed and running. You can also use WSL2 with the Linux installation command.
 
 This will:
+
 - ✅ Check prerequisites (Docker, Docker Compose)
 - ✅ Download necessary files
 - ✅ Pull the pre-built image
@@ -63,6 +67,14 @@ irm https://raw.githubusercontent.com/phioranex/openclaw-docker/main/install.ps1
 $env:TEMP_INSTALL_SCRIPT = irm https://raw.githubusercontent.com/phioranex/openclaw-docker/main/install.ps1; Invoke-Expression $env:TEMP_INSTALL_SCRIPT -InstallDir "C:\openclaw"
 ```
 
+### Uninstallation
+
+To remove OpenClaw (containers, config, and data), you can use the uninstaller script (Windows only for now):
+
+```powershell
+.\uninstall.ps1
+```
+
 ## Manual Install
 
 ### Quick Start
@@ -89,7 +101,7 @@ docker run -d \
 
 ### Using Docker Compose
 
-```bash
+````bash
 # Clone this repo
 git clone https://github.com/phioranex/openclaw-docker.git
 cd openclaw-docker
@@ -98,7 +110,20 @@ cd openclaw-docker
 docker compose run --rm openclaw-cli onboard
 
 # Start the gateway
+# Start the gateway
 docker compose up -d openclaw-gateway
+
+### Local Build (Development)
+
+If you clone this repository and run the installer locally, it will automatically detect the local `Dockerfile` and build the image from source instead of pulling it.
+
+```powershell
+# Windows
+.\install.ps1
+````
+
+This is useful if you want to customize the image (e.g., adding more tools via Brew).
+
 ```
 
 ## Configuration
@@ -146,3 +171,12 @@ Config is stored in `~/.openclaw/` and persists across container restarts.
 
 This Docker packaging is provided by [Phioranex](https://phioranex.com).
 OpenClaw itself is licensed under MIT — see the [original repo](https://github.com/openclaw/openclaw).
+
+## GitHub Actions Configuration
+
+To build and push the image to GHCR from your fork, satisfy the following:
+
+1.  **Permissions**: Go to `Settings` -> `Actions` -> `General` -> `Workflow permissions` and select **Read and write permissions**.
+2.  **Secrets**: No secrets are needed if pushing to the fork's own package registry (defaults to `GITHUB_TOKEN`).
+
+```

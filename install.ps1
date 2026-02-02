@@ -1,5 +1,5 @@
 #
-# OpenClaw (Clawbot) Docker Installer - Windows PowerShell Version
+# OpenClaw Docker Installer - Windows PowerShell Version
 # One-command setup for OpenClaw on Docker for Windows
 #
 # Usage:
@@ -78,7 +78,7 @@ function Test-Command {
 
 # Show help
 if ($Help) {
-    Write-Host "OpenClaw (Clawbot) Docker Installer - Windows"
+    Write-Host "OpenClaw Docker Installer - Windows"
     Write-Host ""
     Write-Host "Usage: install.ps1 [OPTIONS]"
     Write-Host ""
@@ -109,12 +109,19 @@ if (Test-Command docker) {
 
 # Check Docker Compose
 $ComposeCmd = ""
+$ComposeExe = ""
+$ComposeBaseArgs = @()
+
 if (docker compose version 2>$null) {
     Write-Success "Docker Compose found (plugin)"
     $ComposeCmd = "docker compose"
+    $ComposeExe = "docker"
+    $ComposeBaseArgs = @("compose")
 } elseif (Test-Command docker-compose) {
     Write-Success "Docker Compose found (standalone)"
     $ComposeCmd = "docker-compose"
+    $ComposeExe = "docker-compose"
+    $ComposeBaseArgs = @()
 } else {
     Write-Error "Docker Compose not found"
     Write-Host ""
@@ -146,12 +153,28 @@ if ($PullOnly) {
 
 Write-Step "Setting up installation directory..."
 New-Item -ItemType Directory -Force -Path $InstallDir | Out-Null
-Set-Location $InstallDir
-Write-Success "Created $InstallDir"
 
-Write-Step "Downloading docker-compose.yml..."
-Invoke-WebRequest -Uri $ComposeUrl -OutFile "docker-compose.yml"
-Write-Success "Downloaded docker-compose.yml"
+if (Test-Path ".\docker-compose.yml") {
+    Write-Step "Copying local docker-compose.yml..."
+    Copy-Item ".\docker-compose.yml" -Destination "$InstallDir\docker-compose.yml" -Force
+    if (Test-Path ".\Dockerfile") {
+         Copy-Item ".\Dockerfile" -Destination "$InstallDir\Dockerfile" -Force
+         Write-Success "Copying local Dockerfile"
+    }
+    Write-Success "Used local docker-compose.yml"
+    $UseLocalBuild = $true
+} else {
+    Write-Step "Checking installation directory..."
+    Set-Location $InstallDir
+    Write-Success "Created $InstallDir"
+    
+    Write-Step "Downloading docker-compose.yml..."
+    Invoke-WebRequest -Uri $ComposeUrl -OutFile "docker-compose.yml"
+    Write-Success "Downloaded docker-compose.yml"
+    $UseLocalBuild = $false
+}
+
+Set-Location $InstallDir
 
 Write-Step "Creating data directories..."
 $ConfigDir = "$env:USERPROFILE\.openclaw"
@@ -161,9 +184,15 @@ New-Item -ItemType Directory -Force -Path $WorkspaceDir | Out-Null
 Write-Success "Created $ConfigDir (config)"
 Write-Success "Created $WorkspaceDir (workspace)"
 
-Write-Step "Pulling OpenClaw image..."
-docker pull $Image
-Write-Success "Image pulled successfully!"
+if (-not $UseLocalBuild) {
+    Write-Step "Pulling OpenClaw image..."
+    docker pull $Image
+    Write-Success "Image pulled successfully!"
+} else {
+    Write-Step "Building local images..."
+    & $ComposeExe $ComposeBaseArgs build
+    Write-Success "Images built successfully!"
+}
 
 # Onboarding
 if (-not $SkipOnboard) {
@@ -177,7 +206,7 @@ if (-not $SkipOnboard) {
     Write-Host ""
     
     # Run onboarding
-    & $ComposeCmd.Split() run -T --rm openclaw-cli onboard
+    & $ComposeExe $ComposeBaseArgs run --rm openclaw-cli onboard
     if ($LASTEXITCODE -ne 0) {
         Write-Warning "Onboarding wizard was skipped or failed"
         Write-Host "You can run it later with: cd $InstallDir && $ComposeCmd run --rm openclaw-cli onboard" -ForegroundColor Yellow
@@ -189,7 +218,7 @@ if (-not $SkipOnboard) {
 # Start gateway
 if (-not $NoStart) {
     Write-Step "Starting OpenClaw gateway..."
-    & $ComposeCmd.Split() up -d openclaw-gateway
+    & $ComposeExe $ComposeBaseArgs up -d openclaw-gateway
     
     # Wait for gateway to be ready
     Write-Host "Waiting for gateway to start" -NoNewline

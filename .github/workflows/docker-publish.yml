@@ -5,14 +5,25 @@ on:
     branches:
       - main
     tags:
-      - 'v*'
+      - "v*"
   pull_request:
     branches:
       - main
   schedule:
     # Rebuild weekly to get latest Moltbot updates
-    - cron: '0 0 * * 0'
+    - cron: "0 0 * * 0"
   workflow_dispatch:
+    inputs:
+      openclaw_version:
+        description: "OpenClaw version to build (branch/tag)"
+        required: false
+        default: "main"
+        type: string
+      push_image:
+        description: "Push image to registry"
+        required: false
+        default: true
+        type: boolean
 
 env:
   REGISTRY: ghcr.io
@@ -66,4 +77,16 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
           build-args: |
-            MOLTBOT_VERSION=main
+            OPENCLAW_VERSION=${{ github.event.inputs.openclaw_version || 'main' }}
+
+      - name: Generate build summary
+        run: |
+          echo "### 🦞 OpenClaw Docker Build Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**OpenClaw Version:** \`${{ github.event.inputs.openclaw_version || 'main' }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "**Image Tags:**" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          echo "${{ steps.meta.outputs.tags }}" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Registry:** \`${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}\`" >> $GITHUB_STEP_SUMMARY

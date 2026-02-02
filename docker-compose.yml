@@ -9,13 +9,13 @@ services:
       - ~/.openclaw:/home/node/.openclaw
       - ~/.openclaw/workspace:/home/node/.openclaw/workspace
     ports:
-      - "18789:18789"
+      - "18789:18790"
       - "18790:18790"
     environment:
       - NODE_ENV=production
       - OPENCLAW_SKIP_SERVICE_CHECK=true
-    command: ["gateway"]
-  
+    command: [ "gateway" ]
+
   socat-proxy:
     image: alpine/socat
     container_name: openclaw-socat
@@ -33,6 +33,6 @@ services:
       - ~/.openclaw/workspace:/home/node/.openclaw/workspace
     environment:
       - NODE_ENV=production
-    entrypoint: ["node", "/app/dist/index.js"]
+    entrypoint: [ "node", "/app/dist/index.js" ]
     profiles:
       - cli
