@@ -27,9 +27,6 @@ This will:
 - ✅ Run the onboarding wizard
 - ✅ Start the gateway
 
-### Install Options
-
-**Linux / macOS:**
 
 ### Install Options
 
